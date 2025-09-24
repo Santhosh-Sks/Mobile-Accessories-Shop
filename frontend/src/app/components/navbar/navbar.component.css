@@ -1,0 +1,33 @@
+.navbar-brand {
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+
+.nav-link {
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #fff !important;
+}
+
+.dropdown-menu {
+  border: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.badge {
+  font-size: 0.6rem;
+}
+
+@media (max-width: 991px) {
+  .navbar-collapse {
+    margin-top: 1rem;
+  }
+  
+  .dropdown-menu {
+    border: 1px solid #dee2e6;
+    box-shadow: none;
+  }
+}

@@ -1,0 +1,271 @@
+<div class="signup-container">
+  <div class="container-fluid vh-100">
+    <div class="row h-100">
+      <!-- Left Side - Signup Form -->
+      <div class="col-md-8 d-flex align-items-center justify-content-center signup-form-side">
+        <div class="signup-form-container">
+          <div class="text-center mb-4">
+            <h3 class="fw-bold text-primary mb-2">Create Your Account</h3>
+            <p class="text-muted">Join thousands of satisfied customers</p>
+          </div>
+
+          <!-- Success Alert -->
+          <div *ngIf="success" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            {{ success }}
+            <button type="button" class="btn-close" (click)="success = ''" aria-label="Close"></button>
+          </div>
+
+          <!-- Error Alert -->
+          <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            {{ error }}
+            <button type="button" class="btn-close" (click)="error = ''" aria-label="Close"></button>
+          </div>
+
+          <!-- Signup Form -->
+          <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" novalidate>
+            <div class="row">
+              <!-- First Name -->
+              <div class="col-md-6 mb-3">
+                <label for="firstName" class="form-label fw-semibold">
+                  <i class="fas fa-user me-2"></i>First Name
+                </label>
+                <input
+                  type="text"
+                  id="firstName"
+                  class="form-control form-control-lg"
+                  [class.is-invalid]="f['firstName'].invalid && f['firstName'].touched"
+                  [class.is-valid]="f['firstName'].valid && f['firstName'].touched"
+                  formControlName="firstName"
+                  placeholder="Enter first name"
+                  autocomplete="given-name">
+                <div class="invalid-feedback" *ngIf="f['firstName'].invalid && f['firstName'].touched">
+                  <div *ngIf="f['firstName'].errors?.['required']">First name is required</div>
+                  <div *ngIf="f['firstName'].errors?.['minlength']">First name must be at least 2 characters</div>
+                </div>
+              </div>
+
+              <!-- Last Name -->
+              <div class="col-md-6 mb-3">
+                <label for="lastName" class="form-label fw-semibold">
+                  <i class="fas fa-user me-2"></i>Last Name
+                </label>
+                <input
+                  type="text"
+                  id="lastName"
+                  class="form-control form-control-lg"
+                  [class.is-invalid]="f['lastName'].invalid && f['lastName'].touched"
+                  [class.is-valid]="f['lastName'].valid && f['lastName'].touched"
+                  formControlName="lastName"
+                  placeholder="Enter last name"
+                  autocomplete="family-name">
+                <div class="invalid-feedback" *ngIf="f['lastName'].invalid && f['lastName'].touched">
+                  <div *ngIf="f['lastName'].errors?.['required']">Last name is required</div>
+                  <div *ngIf="f['lastName'].errors?.['minlength']">Last name must be at least 2 characters</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-3">
+              <label for="email" class="form-label fw-semibold">
+                <i class="fas fa-envelope me-2"></i>Email Address
+              </label>
+              <input
+                type="email"
+                id="email"
+                class="form-control form-control-lg"
+                [class.is-invalid]="f['email'].invalid && f['email'].touched"
+                [class.is-valid]="f['email'].valid && f['email'].touched"
+                formControlName="email"
+                placeholder="Enter your email"
+                autocomplete="email">
+              <div class="invalid-feedback" *ngIf="f['email'].invalid && f['email'].touched">
+                <div *ngIf="f['email'].errors?.['required']">Email is required</div>
+                <div *ngIf="f['email'].errors?.['email']">Please enter a valid email</div>
+              </div>
+            </div>
+
+            <div class="row">
+              <!-- Password -->
+              <div class="col-md-6 mb-3">
+                <label for="password" class="form-label fw-semibold">
+                  <i class="fas fa-lock me-2"></i>Password
+                </label>
+                <div class="input-group">
+                  <input
+                    [type]="showPassword ? 'text' : 'password'"
+                    id="password"
+                    class="form-control form-control-lg"
+                    [class.is-invalid]="f['password'].invalid && f['password'].touched"
+                    [class.is-valid]="f['password'].valid && f['password'].touched"
+                    formControlName="password"
+                    placeholder="Enter password"
+                    autocomplete="new-password">
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    (click)="togglePasswordVisibility()">
+                    <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                  </button>
+                </div>
+                <div class="invalid-feedback" *ngIf="f['password'].invalid && f['password'].touched">
+                  <div *ngIf="f['password'].errors?.['required']">Password is required</div>
+                  <div *ngIf="f['password'].errors?.['minlength']">Password must be at least 6 characters</div>
+                </div>
+              </div>
+
+              <!-- Confirm Password -->
+              <div class="col-md-6 mb-3">
+                <label for="confirmPassword" class="form-label fw-semibold">
+                  <i class="fas fa-lock me-2"></i>Confirm Password
+                </label>
+                <div class="input-group">
+                  <input
+                    [type]="showConfirmPassword ? 'text' : 'password'"
+                    id="confirmPassword"
+                    class="form-control form-control-lg"
+                    [class.is-invalid]="(f['confirmPassword'].invalid && f['confirmPassword'].touched) || signupForm.errors?.['passwordMismatch']"
+                    [class.is-valid]="f['confirmPassword'].valid && f['confirmPassword'].touched && !signupForm.errors?.['passwordMismatch']"
+                    formControlName="confirmPassword"
+                    placeholder="Confirm password"
+                    autocomplete="new-password">
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    (click)="toggleConfirmPasswordVisibility()">
+                    <i [class]="showConfirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                  </button>
+                </div>
+                <div class="invalid-feedback" *ngIf="(f['confirmPassword'].invalid && f['confirmPassword'].touched) || signupForm.errors?.['passwordMismatch']">
+                  <div *ngIf="f['confirmPassword'].errors?.['required']">Please confirm your password</div>
+                  <div *ngIf="signupForm.errors?.['passwordMismatch']">Passwords do not match</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Phone -->
+            <div class="mb-3">
+              <label for="phone" class="form-label fw-semibold">
+                <i class="fas fa-phone me-2"></i>Phone Number
+              </label>
+              <input
+                type="tel"
+                id="phone"
+                class="form-control form-control-lg"
+                [class.is-invalid]="f['phone'].invalid && f['phone'].touched"
+                [class.is-valid]="f['phone'].valid && f['phone'].touched"
+                formControlName="phone"
+                placeholder="Enter 10-digit phone number"
+                autocomplete="tel">
+              <div class="invalid-feedback" *ngIf="f['phone'].invalid && f['phone'].touched">
+                <div *ngIf="f['phone'].errors?.['required']">Phone number is required</div>
+                <div *ngIf="f['phone'].errors?.['pattern']">Please enter a valid 10-digit phone number</div>
+              </div>
+            </div>
+
+            <!-- Address -->
+            <div class="mb-3">
+              <label for="address" class="form-label fw-semibold">
+                <i class="fas fa-map-marker-alt me-2"></i>Address
+              </label>
+              <textarea
+                id="address"
+                class="form-control form-control-lg"
+                [class.is-invalid]="f['address'].invalid && f['address'].touched"
+                [class.is-valid]="f['address'].valid && f['address'].touched"
+                formControlName="address"
+                placeholder="Enter your full address"
+                rows="3"
+                autocomplete="street-address"></textarea>
+              <div class="invalid-feedback" *ngIf="f['address'].invalid && f['address'].touched">
+                <div *ngIf="f['address'].errors?.['required']">Address is required</div>
+              </div>
+            </div>
+
+            <!-- Terms and Conditions -->
+            <div class="mb-4">
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  [class.is-invalid]="f['agreeToTerms'].invalid && f['agreeToTerms'].touched"
+                  type="checkbox"
+                  id="agreeToTerms"
+                  formControlName="agreeToTerms">
+                <label class="form-check-label" for="agreeToTerms">
+                  I agree to the <a href="#" class="text-decoration-none">Terms and Conditions</a> and <a href="#" class="text-decoration-none">Privacy Policy</a>
+                </label>
+                <div class="invalid-feedback" *ngIf="f['agreeToTerms'].invalid && f['agreeToTerms'].touched">
+                  You must agree to the terms and conditions
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button
+              type="submit"
+              class="btn btn-primary btn-lg w-100 mb-3"
+              [disabled]="loading">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status"></span>
+              <i *ngIf="!loading" class="fas fa-user-plus me-2"></i>
+              {{ loading ? 'Creating Account...' : 'Create Account' }}
+            </button>
+
+            <!-- Login Link -->
+            <div class="text-center">
+              <p class="text-muted mb-0">
+                Already have an account?
+                <a routerLink="/login" class="text-decoration-none fw-semibold">Sign In</a>
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Right Side - Benefits -->
+      <div class="col-md-4 d-none d-md-flex signup-benefits-side">
+        <div class="d-flex flex-column justify-content-center align-items-center text-white w-100 p-5">
+          <div class="text-center">
+            <i class="fas fa-mobile-alt fa-4x mb-4"></i>
+            <h4 class="fw-bold mb-4">Why Join Us?</h4>
+            
+            <div class="benefits-list">
+              <div class="benefit-item mb-4">
+                <div class="benefit-icon mb-2">
+                  <i class="fas fa-shipping-fast fa-2x"></i>
+                </div>
+                <h6 class="fw-bold">Fast Delivery</h6>
+                <p class="small mb-0">Get your orders delivered quickly and safely</p>
+              </div>
+
+              <div class="benefit-item mb-4">
+                <div class="benefit-icon mb-2">
+                  <i class="fas fa-shield-alt fa-2x"></i>
+                </div>
+                <h6 class="fw-bold">Secure Shopping</h6>
+                <p class="small mb-0">Your data and payments are always protected</p>
+              </div>
+
+              <div class="benefit-item mb-4">
+                <div class="benefit-icon mb-2">
+                  <i class="fas fa-headset fa-2x"></i>
+                </div>
+                <h6 class="fw-bold">24/7 Support</h6>
+                <p class="small mb-0">Our team is always here to help you</p>
+              </div>
+
+              <div class="benefit-item mb-4">
+                <div class="benefit-icon mb-2">
+                  <i class="fas fa-tags fa-2x"></i>
+                </div>
+                <h6 class="fw-bold">Best Prices</h6>
+                <p class="small mb-0">Competitive prices and exclusive deals</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

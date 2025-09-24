@@ -1,0 +1,127 @@
+<div class="login-container">
+  <div class="container-fluid vh-100">
+    <div class="row h-100">
+      <!-- Left Side - Branding -->
+      <div class="col-md-6 d-none d-md-flex login-brand-side">
+        <div class="d-flex flex-column justify-content-center align-items-center text-white w-100">
+          <div class="text-center">
+            <i class="fas fa-mobile-alt fa-5x mb-4"></i>
+            <h2 class="display-4 fw-bold mb-3">Mobile Accessories Shop</h2>
+            <p class="lead mb-4">Your one-stop destination for premium mobile accessories</p>
+            <div class="features-list">
+              <div class="feature-item mb-2">
+                <i class="fas fa-check-circle me-2"></i>
+                <span>Premium Quality Products</span>
+              </div>
+              <div class="feature-item mb-2">
+                <i class="fas fa-check-circle me-2"></i>
+                <span>Fast & Secure Delivery</span>
+              </div>
+              <div class="feature-item mb-2">
+                <i class="fas fa-check-circle me-2"></i>
+                <span>24/7 Customer Support</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Side - Login Form -->
+      <div class="col-md-6 d-flex align-items-center justify-content-center login-form-side">
+        <div class="login-form-container">
+          <div class="text-center mb-4">
+            <h3 class="fw-bold text-primary mb-2">Welcome Back!</h3>
+            <p class="text-muted">Sign in to your account to continue</p>
+          </div>
+
+          <!-- Error Alert -->
+          <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            {{ error }}
+            <button type="button" class="btn-close" (click)="error = ''" aria-label="Close"></button>
+          </div>
+
+          <!-- Login Form -->
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+            <!-- Email Field -->
+            <div class="mb-3">
+              <label for="email" class="form-label fw-semibold">
+                <i class="fas fa-envelope me-2"></i>Email Address
+              </label>
+              <input
+                type="email"
+                id="email"
+                class="form-control form-control-lg"
+                [class.is-invalid]="f['email'].invalid && f['email'].touched"
+                [class.is-valid]="f['email'].valid && f['email'].touched"
+                formControlName="email"
+                placeholder="Enter your email"
+                autocomplete="email">
+              <div class="invalid-feedback" *ngIf="f['email'].invalid && f['email'].touched">
+                <div *ngIf="f['email'].errors?.['required']">Email is required</div>
+                <div *ngIf="f['email'].errors?.['email']">Please enter a valid email</div>
+              </div>
+            </div>
+
+            <!-- Password Field -->
+            <div class="mb-3">
+              <label for="password" class="form-label fw-semibold">
+                <i class="fas fa-lock me-2"></i>Password
+              </label>
+              <div class="input-group">
+                <input
+                  [type]="showPassword ? 'text' : 'password'"
+                  id="password"
+                  class="form-control form-control-lg"
+                  [class.is-invalid]="f['password'].invalid && f['password'].touched"
+                  [class.is-valid]="f['password'].valid && f['password'].touched"
+                  formControlName="password"
+                  placeholder="Enter your password"
+                  autocomplete="current-password">
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  (click)="togglePasswordVisibility()">
+                  <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                </button>
+              </div>
+              <div class="invalid-feedback" *ngIf="f['password'].invalid && f['password'].touched">
+                <div *ngIf="f['password'].errors?.['required']">Password is required</div>
+                <div *ngIf="f['password'].errors?.['minlength']">Password must be at least 6 characters</div>
+              </div>
+            </div>
+
+            <!-- Remember Me & Forgot Password -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="rememberMe">
+                <label class="form-check-label" for="rememberMe">
+                  Remember me
+                </label>
+              </div>
+              <a href="#" class="text-decoration-none">Forgot Password?</a>
+            </div>
+
+            <!-- Submit Button -->
+            <button
+              type="submit"
+              class="btn btn-primary btn-lg w-100 mb-3"
+              [disabled]="loading">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status"></span>
+              <i *ngIf="!loading" class="fas fa-sign-in-alt me-2"></i>
+              {{ loading ? 'Signing In...' : 'Sign In' }}
+            </button>
+
+            <!-- Sign Up Link -->
+            <div class="text-center">
+              <p class="text-muted mb-0">
+                Don't have an account?
+                <a routerLink="/signup" class="text-decoration-none fw-semibold">Create Account</a>
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,110 @@
+<div class="container mt-4">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading product details...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="alert alert-danger">
+    <h4>Error</h4>
+    <p>{{ error }}</p>
+    <button class="btn btn-primary" (click)="goBack()">Back to Products</button>
+  </div>
+
+  <!-- Product Details -->
+  <div *ngIf="product && !loading" class="row">
+    <div class="col-md-6">
+      <img [src]="product.image || '/assets/images/placeholder.jpg'" 
+           [alt]="product.name" 
+           class="img-fluid rounded shadow">
+    </div>
+    
+    <div class="col-md-6">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a routerLink="/">Home</a>
+          </li>
+          <li class="breadcrumb-item">
+            <a routerLink="/products">Products</a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">
+            {{ product.name }}
+          </li>
+        </ol>
+      </nav>
+
+      <h1 class="display-5">{{ product.name }}</h1>
+      <p class="lead text-muted">{{ product.brand }}</p>
+      
+      <div class="mb-3">
+        <span class="badge bg-secondary me-2">{{ product.category }}</span>
+        <span *ngIf="product.stock > 0" class="badge bg-success">In Stock ({{ product.stock }})</span>
+        <span *ngIf="product.stock === 0" class="badge bg-danger">Out of Stock</span>
+      </div>
+
+      <h2 class="text-primary mb-3">₹{{ product.price | number:'1.2-2' }}</h2>
+
+      <div class="mb-4">
+        <h5>Description</h5>
+        <p>{{ product.description }}</p>
+      </div>
+
+      <div class="mb-4" *ngIf="product.specifications">
+        <h5>Specifications</h5>
+        <ul class="list-unstyled">
+          <li *ngIf="product.specifications.compatibility" class="mb-1">
+            <i class="fas fa-check text-success me-2"></i>
+            <strong>Compatibility:</strong> {{ product.specifications.compatibility }}
+          </li>
+          <li *ngIf="product.specifications.color" class="mb-1">
+            <i class="fas fa-check text-success me-2"></i>
+            <strong>Color:</strong> {{ product.specifications.color }}
+          </li>
+          <li *ngIf="product.specifications.material" class="mb-1">
+            <i class="fas fa-check text-success me-2"></i>
+            <strong>Material:</strong> {{ product.specifications.material }}
+          </li>
+          <li *ngIf="product.specifications.warranty" class="mb-1">
+            <i class="fas fa-check text-success me-2"></i>
+            <strong>Warranty:</strong> {{ product.specifications.warranty }}
+          </li>
+        </ul>
+      </div>
+
+      <div class="d-grid gap-2 d-md-flex">
+        <button 
+          class="btn btn-primary btn-lg flex-fill" 
+          [disabled]="product.stock === 0 || isInCart()"
+          (click)="addToCart()">
+          <i class="fas fa-shopping-cart me-2"></i>
+          <span *ngIf="!isInCart()">Add to Cart</span>
+          <span *ngIf="isInCart()">Already in Cart</span>
+        </button>
+        
+        <button class="btn btn-outline-secondary" (click)="goBack()">
+          <i class="fas fa-arrow-left me-2"></i>Back
+        </button>
+      </div>
+
+      <div class="mt-4">
+        <h6>Shipping Info</h6>
+        <small class="text-muted">
+          <i class="fas fa-truck me-2"></i>Free shipping on orders above ₹999<br>
+          <i class="fas fa-undo me-2"></i>30-day return policy<br>
+          <i class="fas fa-shield-alt me-2"></i>1-year warranty
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Related Products Section -->
+  <div *ngIf="product && !loading" class="mt-5">
+    <h3>Related Products</h3>
+    <p class="text-muted">You might also like these products</p>
+    <!-- Add related products component here -->
+  </div>
+</div>

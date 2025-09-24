@@ -1,0 +1,377 @@
+<div class="admin-dashboard">
+  <div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="h3 mb-1">Admin Dashboard</h2>
+        <p class="text-muted mb-0">Manage your mobile accessories store</p>
+      </div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-primary" (click)="loadProducts()">
+          <i class="fas fa-refresh me-2"></i>Refresh
+        </button>
+        <button class="btn btn-primary" (click)="toggleProductForm()">
+          <i class="fas fa-plus me-2"></i>Add Product
+        </button>
+      </div>
+    </div>
+
+    <!-- Success/Error Alerts -->
+    <div *ngIf="success" class="alert alert-success alert-dismissible fade show" role="alert">
+      <i class="fas fa-check-circle me-2"></i>{{ success }}
+      <button type="button" class="btn-close" (click)="success = ''" aria-label="Close"></button>
+    </div>
+
+    <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <i class="fas fa-exclamation-triangle me-2"></i>{{ error }}
+      <button type="button" class="btn-close" (click)="error = ''" aria-label="Close"></button>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+      <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card stats-card border-primary">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="card-subtitle mb-1 text-muted">Total Products</h6>
+                <h3 class="card-title mb-0">{{ totalProducts }}</h3>
+              </div>
+              <div class="stats-icon bg-primary">
+                <i class="fas fa-boxes"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card stats-card border-success">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="card-subtitle mb-1 text-muted">Total Orders</h6>
+                <h3 class="card-title mb-0">{{ totalOrders }}</h3>
+              </div>
+              <div class="stats-icon bg-success">
+                <i class="fas fa-shopping-cart"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card stats-card border-warning">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="card-subtitle mb-1 text-muted">Total Revenue</h6>
+                <h3 class="card-title mb-0">₹{{ totalRevenue | number:'1.2-2' }}</h3>
+              </div>
+              <div class="stats-icon bg-warning">
+                <i class="fas fa-rupee-sign"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card stats-card border-danger">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="card-subtitle mb-1 text-muted">Pending Orders</h6>
+                <h3 class="card-title mb-0">{{ pendingOrders }}</h3>
+              </div>
+              <div class="stats-icon bg-danger">
+                <i class="fas fa-clock"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Form Modal -->
+    <div *ngIf="showProductForm" class="modal d-block" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              {{ editingProduct ? 'Edit Product' : 'Add New Product' }}
+            </h5>
+            <button type="button" class="btn-close" (click)="resetForm()"></button>
+          </div>
+          <form [formGroup]="productForm" (ngSubmit)="onSubmitProduct()">
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="name" class="form-label">Product Name *</label>
+                  <input type="text" class="form-control" formControlName="name" 
+                         [class.is-invalid]="f['name'].invalid && f['name'].touched">
+                  <div class="invalid-feedback" *ngIf="f['name'].invalid && f['name'].touched">
+                    <div *ngIf="f['name'].errors?.['required']">Product name is required</div>
+                    <div *ngIf="f['name'].errors?.['minlength']">Name must be at least 3 characters</div>
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="category" class="form-label">Category *</label>
+                  <select class="form-control" formControlName="category"
+                          [class.is-invalid]="f['category'].invalid && f['category'].touched">
+                    <option value="">Select Category</option>
+                    <option value="Cases & Covers">Cases & Covers</option>
+                    <option value="Screen Protectors">Screen Protectors</option>
+                    <option value="Chargers & Cables">Chargers & Cables</option>
+                    <option value="Power Banks">Power Banks</option>
+                    <option value="Earphones & Headphones">Earphones & Headphones</option>
+                    <option value="Car Accessories">Car Accessories</option>
+                    <option value="Others">Others</option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="f['category'].invalid && f['category'].touched">
+                    Category is required
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="description" class="form-label">Description *</label>
+                <textarea class="form-control" formControlName="description" rows="3"
+                          [class.is-invalid]="f['description'].invalid && f['description'].touched"></textarea>
+                <div class="invalid-feedback" *ngIf="f['description'].invalid && f['description'].touched">
+                  <div *ngIf="f['description'].errors?.['required']">Description is required</div>
+                  <div *ngIf="f['description'].errors?.['minlength']">Description must be at least 10 characters</div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-4 mb-3">
+                  <label for="price" class="form-label">Price (₹) *</label>
+                  <input type="number" class="form-control" formControlName="price" step="0.01"
+                         [class.is-invalid]="f['price'].invalid && f['price'].touched">
+                  <div class="invalid-feedback" *ngIf="f['price'].invalid && f['price'].touched">
+                    <div *ngIf="f['price'].errors?.['required']">Price is required</div>
+                    <div *ngIf="f['price'].errors?.['min']">Price must be greater than 0</div>
+                  </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                  <label for="stock" class="form-label">Stock *</label>
+                  <input type="number" class="form-control" formControlName="stock"
+                         [class.is-invalid]="f['stock'].invalid && f['stock'].touched">
+                  <div class="invalid-feedback" *ngIf="f['stock'].invalid && f['stock'].touched">
+                    <div *ngIf="f['stock'].errors?.['required']">Stock is required</div>
+                    <div *ngIf="f['stock'].errors?.['min']">Stock cannot be negative</div>
+                  </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                  <label for="brand" class="form-label">Brand *</label>
+                  <input type="text" class="form-control" formControlName="brand"
+                         [class.is-invalid]="f['brand'].invalid && f['brand'].touched">
+                  <div class="invalid-feedback" *ngIf="f['brand'].invalid && f['brand'].touched">
+                    Brand is required
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="image" class="form-label">Image URL *</label>
+                <input type="url" class="form-control" formControlName="image"
+                       [class.is-invalid]="f['image'].invalid && f['image'].touched">
+                <div class="invalid-feedback" *ngIf="f['image'].invalid && f['image'].touched">
+                  Valid image URL is required
+                </div>
+              </div>
+
+              <div formGroupName="specifications">
+                <h6 class="mb-3">Specifications</h6>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="color" class="form-label">Color</label>
+                    <input type="text" class="form-control" formControlName="color">
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="material" class="form-label">Material</label>
+                    <input type="text" class="form-control" formControlName="material">
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="compatibility" class="form-label">Compatibility</label>
+                    <input type="text" class="form-control" formControlName="compatibility">
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="features" class="form-label">Features</label>
+                    <input type="text" class="form-control" formControlName="features">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" (click)="resetForm()">Cancel</button>
+              <button type="submit" class="btn btn-primary" [disabled]="loading">
+                <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                {{ editingProduct ? 'Update Product' : 'Create Product' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Tabs -->
+    <ul class="nav nav-tabs" id="adminTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="products-tab" data-bs-toggle="tab" data-bs-target="#products" 
+                type="button" role="tab">
+          <i class="fas fa-boxes me-2"></i>Products
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="orders-tab" data-bs-toggle="tab" data-bs-target="#orders" 
+                type="button" role="tab">
+          <i class="fas fa-shopping-cart me-2"></i>Orders
+        </button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="adminTabContent">
+      <!-- Products Tab -->
+      <div class="tab-pane fade show active" id="products" role="tabpanel">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">Products Management</h5>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Brand</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let product of products; trackBy: trackByProductId">
+                    <td>
+                      <img [src]="product.image" [alt]="product.name" class="product-image">
+                    </td>
+                    <td>
+                      <div class="fw-bold">{{ product.name }}</div>
+                      <small class="text-muted">{{ product.description | slice:0:50 }}...</small>
+                    </td>
+                    <td>
+                      <span class="badge bg-primary">{{ product.category }}</span>
+                    </td>
+                    <td class="fw-bold">₹{{ product.price | number:'1.2-2' }}</td>
+                    <td>
+                      <span [class]="product.stock > 10 ? 'badge bg-success' : product.stock > 0 ? 'badge bg-warning' : 'badge bg-danger'">
+                        {{ product.stock }} in stock
+                      </span>
+                    </td>
+                    <td>{{ product.brand }}</td>
+                    <td>
+                      <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-primary" (click)="editProduct(product)">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-outline-danger" (click)="deleteProduct(product._id!)">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr *ngIf="products.length === 0">
+                    <td colspan="7" class="text-center py-4 text-muted">
+                      <i class="fas fa-box-open fa-2x mb-2"></i>
+                      <div>No products found</div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Orders Tab -->
+      <div class="tab-pane fade" id="orders" role="tabpanel">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">Orders Management</h5>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Order #</th>
+                    <th>Customer</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let order of orders; trackBy: trackByOrderId">
+                    <td class="fw-bold">#{{ order.orderNumber }}</td>
+                    <td>
+                      <div>{{ order.shippingAddress.firstName }} {{ order.shippingAddress.lastName }}</div>
+                      <small class="text-muted">{{ order.shippingAddress.email }}</small>
+                    </td>
+                    <td>{{ order.items.length }} item(s)</td>
+                    <td class="fw-bold">₹{{ order.totalAmount | number:'1.2-2' }}</td>
+                    <td>
+                      <select class="form-select form-select-sm" 
+                              [value]="order.orderStatus" 
+                              (change)="onOrderStatusChange($event, order._id!)">
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="processing">Processing</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                    </td>
+                    <td>{{ order.createdAt | date:'short' }}</td>
+                    <td>
+                      <button class="btn btn-outline-info btn-sm" [routerLink]="['/orders', order._id]">
+                        <i class="fas fa-eye"></i> View
+                      </button>
+                    </td>
+                  </tr>
+                  <tr *ngIf="orders.length === 0">
+                    <td colspan="7" class="text-center py-4 text-muted">
+                      <i class="fas fa-shopping-cart fa-2x mb-2"></i>
+                      <div>No orders found</div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div *ngIf="loading" class="loading-overlay">
+    <div class="text-center">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <div class="mt-2">Loading...</div>
+    </div>
+  </div>
+</div>
